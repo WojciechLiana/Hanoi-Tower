@@ -1,0 +1,93 @@
+body {
+    background-color: green;
+}
+
+.title {
+    font-weight: bolder;
+    font-size: 50px;
+    text-align: center;
+}
+
+.button {
+    text-align: center;
+    padding-top: 50px;
+}
+
+.button #start_button {
+    margin-right: 3%;
+    margin-left: 32%;
+}
+
+.button #help_button {
+    margin-right: 3%;
+}
+
+.buttony{
+    width: 10%;
+    height: 50px;
+    border-radius: 30px;
+    font-weight: bold;
+    background-color: grey;
+    border-width: 0;
+    float: left;
+}
+
+.buttony:hover {
+    color: red;
+    background-color: black;
+}
+
+.rules {
+    clear: both;
+    text-align: center;
+}
+
+img{
+
+}
+
+.hidden {
+    display: none;
+}
+
+.board{
+   text-align: center;
+}
+.myTable {
+    text-align: center;
+    margin-right: 45%;
+}
+
+td {
+    border: solid;
+    border-color: black;
+    width: 20px;
+    height: 20px;
+    text-align: center;
+}
+
+.tower_height{
+    text-align: center;
+}
+
+.tower_height div{
+    padding-bottom: 20px;
+}
+
+.tower_height button{
+    background-color: grey;
+    width: 40px;
+    height: 40px;
+    border-width: 0px;
+}
+
+.tower_height button:hover {
+    color: red;
+    background-color: black;
+}
+
+.copyright {
+    text-align: center;
+    font-size: smaller;
+    padding-top: 20px;
+}
