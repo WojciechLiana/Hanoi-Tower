@@ -4,26 +4,24 @@ body {
 
 .title {
     font-weight: bolder;
-    font-size: 50px;
+    font-size: 45px;
     text-align: center;
 }
 
 .button {
-    text-align: center;
-    padding-top: 50px;
-}
-
-.button #start_button {
-    margin-right: 3%;
-    margin-left: 32%;
+    padding-top: 30px;
+    padding-bottom: 20px;
+    height: 50px;
+    margin-left: 34%;
 }
 
 .button #help_button {
+    margin-left: 3%;
     margin-right: 3%;
 }
 
 .buttony{
-    width: 10%;
+    width: 14%;
     height: 50px;
     border-radius: 30px;
     font-weight: bold;
@@ -43,7 +41,8 @@ body {
 }
 
 img{
-
+    display: block;
+    margin: 0 auto;
 }
 
 .hidden {
@@ -51,27 +50,28 @@ img{
 }
 
 .board{
-   text-align: center;
-}
-.myTable {
     text-align: center;
-    margin-right: 45%;
+}
+
+.myTable {
+    margin: 0 auto;
 }
 
 td {
-    border: solid;
-    border-color: black;
-    width: 20px;
+    width: 112px;
     height: 20px;
     text-align: center;
+    margin: 0;
 }
 
 .tower_height{
     text-align: center;
+    visibility: hidden;
 }
 
 .tower_height div{
     padding-bottom: 20px;
+    visibility: visible;
 }
 
 .tower_height button{
@@ -79,6 +79,7 @@ td {
     width: 40px;
     height: 40px;
     border-width: 0px;
+    visibility: visible;
 }
 
 .tower_height button:hover {
@@ -89,5 +90,30 @@ td {
 .copyright {
     text-align: center;
     font-size: smaller;
-    padding-top: 20px;
+    padding-top: 10px;
+}
+
+td button {
+    width: 40px;
+    background-color: grey;
+    border-color: grey;
+}
+
+td button:hover {
+    color: red;
+    background-color: black;
+    border-color: black;
+}
+
+.moves_counter input{
+    width: 40px;
+    margin-top: 20px;
+    text-align: center;
+    background-color: grey;
+    border-color: grey;
+    color: black;
+}
+
+.moves_counter{
+    text-align: center;
 }
