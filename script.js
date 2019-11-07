@@ -8,50 +8,31 @@ document.addEventListener("DOMContentLoaded", function() {
         rules.classList.toggle('hidden');
     });
 
+    //licznik ruchow
+    const moves_counter = document.querySelector('.moves_counter input');
+
     // tabela oraz xyz, przyciski ktorymi sie bedzie wieze obslugiwalo
     const table = document.querySelectorAll('tr');
-    const X = document.querySelector('.x'); // przyciski przenoszace krazki
-    const Y = document.querySelector('.y');
-    const Z = document.querySelector('.z');
-    let table2 = [];
-    let number_of_discs = 5;
-    const three_discs = document.querySelector('.disc3'); // pobieram sobie porzyciski
-    const four_discs = document.querySelector('.disc4');
-    const five_discs = document.querySelector('.disc5');
-    const six_discs = document.querySelector('.disc6');
-    const seven_discs = document.querySelector('.disc7');
-    const eight_discs = document.querySelector('.disc8');
+    let number_of_discs = 5;  // startowa ilosc dyskow
+    const tower_height = document.querySelector('.tower_height');
 
-    three_discs.addEventListener('click', function () { // ustalam ile chce miec krazkow
-        number_of_discs = this.innerText;
-    });
-    four_discs.addEventListener('click', function () {
-        number_of_discs = this.innerText;
-    });
-    five_discs.addEventListener('click', function () {
-        number_of_discs = this.innerText;
-    });
-    six_discs.addEventListener('click', function () {
-        number_of_discs = this.innerText;
-    });
-    seven_discs.addEventListener('click', function () {
-        number_of_discs = this.innerText;
-    });
-    eight_discs.addEventListener('click', function () {
-        number_of_discs = this.innerText;
+    // ilosc krazkow w grze
+    tower_height.addEventListener('click', function (e) { // this nie dziala bo wskazuje na window, zostalo bondowanie lub obejscie jak ja to zrobilem
+        number_of_discs = e.target.innerText;
     });
 
     // poczatek gry, uklada krazki
     const start_game = function (discs) {
         let set_discs = discs;
+        moves_counter.value =0;
         for (let j = 0; j < 3; j++) {
             for (let i = 0; i < 10; i++) {
-                table[i].children[j].innerText = '';
+                table[i].children[j].innerHTML = '';
             }
         } // czyszczenie tablicy
         let counter = 0;
         for (let k = 9; k > 9 - set_discs; k--) {
-            table[k].children[0].innerText = set_discs - counter;
+            table[k].children[0].innerHTML = '<img src="'+(set_discs - counter)+'.jpg">';
             counter++;
         }
     }
@@ -61,135 +42,66 @@ document.addEventListener("DOMContentLoaded", function() {
         start_game(number_of_discs);
     });
 
+    const you_won = function(){  // warunek wygranej
+        if (table[9].children[0].innerHTML == '' && table[9].children[1].innerHTML == '' &&
+            table[0].children[0].innerHTML == '' && table[0].children[1].innerHTML == '') {
+        alert('wygrales');
+        }
+    }
 
-    // funkcja poruszajaca krazek
-    const move_top = function (row) {
-        for (let i = 0; i < 3; i++) { // to co pobralem - table - to nie tablica tylko jakis obiekt a pozniej przyda mi sie tablica jednak
-            table2.push(table[0].children[i].innerText);
+    // funkcja poruszajaca krazek manualnie
+    const move_manual = function (row) {
+        let value;
+        if (table[0].children[row].innerHTML != '') {// krazek u gory w tej kolumnie co przycisk wiec wraca na dol
+            value = table[0].children[row].innerHTML;  // musze to zrobic przez zmienna inaczej nie bede w stanie uzyc funkcji check_col
+            table[0].children[row].innerHTML = '';
+            table[check_col(row)[0] - 1].children[row].innerHTML = value;
+            return;
         }
-
-        console.log(table2);
-        if (table[0].children[row].innerText != '') {
-            let value = table[0].children[row].innerText;
-            table[0].children[row].innerText = '';
-            for (let i = 0; i < 11; i++) {
-                if (table[i].children[row].innerText == '') {
-                    console.log('do nothing');
-                }
-                else {
-                    table[i - 1].children[row].innerText = value;
-                    break;
-                }
-            }
-        } // krazek u gory w tej kolumnie co przycisk wiec wraca na dol
-
-        else if (table[0].children[0].innerText != '') { // jesli sie nie znajduje u gory, sprawdzam czy jest w innej kolumnie u gory, jak tak, przeciagam go na obecny stos, jak nie z obecnego idzie do gory
-            if (table[9].children[row].innerText == '') {
-                table[9].children[row].innerText = table[0].children[0].innerText;
-                table[0].children[0].innerText = '';
-            } else {
-                for (let i = 0; i < 11; i++) {
-                    if (table[i].children[row].innerText == '') {
-                        console.log('do nothing');
-                    }
-                    else {
-                        if (table[i].children[row].innerText > table[0].children[0].innerText) {
-                            table[i - 1].children[row].innerText = table[0].children[0].innerText;
-                            table[0].children[0].innerText = '';
-                        }
-                        else {
-                            alert('niedozwolony ruch');
-                        }
-                        break;
+        for (let i=0; i<3; i++) {
+            if (table[0].children[i].innerHTML != '') { // jesli krazek jest u gory, ale nie w kolumnie ktora klikam
+                if (table[9].children[row].innerHTML == '') { // jesli kolumna w ktora klikam jest pusta, przenosze tam krazek
+                    table[9].children[row].innerHTML = table[0].children[i].innerHTML;
+                    table[0].children[i].innerHTML = '';
+                    moves_counter.value++;
+                    return;
+                } else {  // jesli nie jest pusta
+                    if (table[check_col(row)[0]].children[row].innerHTML < table[0].children[i].innerHTML) { // jesli krazek w kolumnie kliknietej jest mniejszy - blad
+                        alert('niedozwolony ruch');
+                        moves_counter.value++;
+                        return;
+                    } else { // jest wiekszy - przenosze krazek
+                        table[check_col(row)[0] - 1].children[row].innerHTML = table[0].children[i].innerHTML;
+                        table[0].children[i].innerHTML = '';
+                        moves_counter.value++;
+                        you_won();
+                        return;
                     }
                 }
             }
         }
-        else if (table[0].children[1].innerText != '') { // jesli sie nie znajduje u gory, sprawdzam czy jest w innej kolumnie u gory, jak tak, przeciagam go na obecny stos, jak nie z obecnego idzie do gory
-            if (table[9].children[row].innerText == '') {
-                table[9].children[row].innerText = table[0].children[1].innerText;
-                table[0].children[1].innerText = '';
-            } else {
-                for (let i = 0; i < 11; i++) {
-                    if (table[i].children[row].innerText == '') {
-                        console.log('do nothing');
-                    }
-                    else {
-                        if (table[i].children[row].innerText > table[0].children[1].innerText) {
-                            table[i - 1].children[row].innerText = table[0].children[1].innerText;
-                            table[0].children[1].innerText = '';
-                        }
-                        else {
-                            alert('niedozwolony ruch');
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        else if (table[0].children[2].innerText != '') { // jesli sie nie znajduje u gory, sprawdzam czy jest w innej kolumnie u gory, jak tak, przeciagam go na obecny stos, jak nie z obecnego idzie do gory
-            if (table[9].children[row].innerText == '') {
-                table[9].children[row].innerText = table[0].children[2].innerText;
-                table[0].children[2].innerText = '';
-            } else {
-                for (let i = 0; i < 11; i++) {
-                    if (table[i].children[row].innerText == '') {
-                        console.log('do nothing');
-                    }
-                    else {
-                        if (table[i].children[row].innerText > table[0].children[2].innerText) {
-                            table[i - 1].children[row].innerText = table[0].children[2].innerText;
-                            table[0].children[2].innerText = '';
-                        }
-                        else {
-                            alert('niedozwolony ruch');
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        else {
-            for (let i = 0; i < 10; i++) {
-                if (table[i].children[row].innerText != '') {
-                    table[0].children[row].innerText = table[i].children[row].innerText;
-                    table[i].children[row].innerText = '';
-                    break;
-                } else {
-                    console.log('do nothing');
-                }
-            } // podnoszenie do gory
-        }
-        if (table[9].children[0].innerText == '' && table[9].children[1].innerText == '' &&
-            table[0].children[0].innerText == '' && table[0].children[1].innerText == '') {
-            alert('wygrales');
+        if(table[9].children[row].innerHTML != ''){ // jesli petla dojdzie az tu i jest tam jakis krazek, podnosze go do gory
+            value = table[check_col(row)[0]].children[row].innerHTML;
+            table[check_col(row)[0]].children[row].innerHTML = '';
+            table[0].children[row].innerHTML = value;
+            return;
         }
     }
 
     // podpiecie funkcji przesuwajacej krazek do przycisku odpowiedniego
-    X.addEventListener('click', function () {
-        move_top(X.innerText)
+    table[10].addEventListener('click', function (e) { // tu tez nie trzeba 3 listenerow
+        move_manual(e.target.innerText);
     }); // listenery do gry
-    Y.addEventListener('click', function () {
-        move_top(Y.innerText)
-    });
-    Z.addEventListener('click', function () {
-        move_top(Z.innerText)
-    });
 
     // gdyby ktos chcial podpowiedz i ma jakis krazek u gory, funkcja sciaga go na dol
     const auto_solve_prepare = function () {
-        if (table[0].children[0].innerText != ''){
-            table[check_col(0)[0]-1].children[0].innerText = table[0].children[0].innerText;
-            table[0].children[0].innerText = '';
-        }
-        if(table[0].children[1].innerText != '' ) {
-            table[check_col(1)[0] - 1].children[1].innerText = table[0].children[1].innerText;
-            table[0].children[1].innerText = '';
-        }
-        if(table[0].children[2].innerText != '') {
-            table[check_col(2)[0]-1].children[2].innerText = table[0].children[2].innerText;
-            table[0].children[2].innerText = '';
+        let value; // ze wzgledu na wyglad funkcji check_col trzeba uzyc zmiennej posredniej inaczej sie wywala
+        for(let i=0; i<3; i++){
+            if(table[0].children[i].innerHTML != ''){
+                value = table[0].children[i].innerHTML;
+                table[0].children[i].innerHTML = '';
+                table[check_col(i)[0]-1].children[i].innerHTML = value;
+            }
         }
     }
 
@@ -197,24 +109,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const move1_auto = function(){
         for (let j = 0; j < 3; j++) {
             for (let i = 0; i < 10; i++) {
-                if(table[i].children[j].innerText == '1'){ // szukam jedynki, przesunac ja chce o 1 pole
+                if(table[i].children[j].innerHTML == '<img src="1.jpg">'){ // szukam jedynki, przesunac ja chce o 1 pole
                     if(j==2){ // dziala gdy 1 musi wrocic na poczatek
-                        for(let k=0; k<11; k++){
-                            if(table[k].children[j-2].innerText != ''){
-                                table[k-1].children[j-2].innerText = table[i].children[j].innerText;
-                                table[i].children[j].innerText = '';
-                                return [k-1, j-2];
-                            }
-                        }
+                                table[check_col(j-2)[0]-1].children[j-2].innerHTML = table[i].children[j].innerHTML;
+                                table[i].children[j].innerHTML = '';
+                                moves_counter.value++;
+                                return;
                     }
                     else{  // dziala gdy 1 przeskakuje na kolejna wierze
-                        for(let k=0; k<11; k++){
-                            if(table[k].children[j+1].innerText != ''){
-                                table[k-1].children[j+1].innerText = table[i].children[j].innerText;
-                                table[i].children[j].innerText = '';
-                                return [k-1, j+1];
-                            }
-                        }
+                                table[check_col(j+1)[0]-1].children[j+1].innerHTML = table[i].children[j].innerHTML;
+                                table[i].children[j].innerHTML = '';
+                                moves_counter.value++;
+                                return;
                     }
                 }
             }
@@ -223,13 +129,13 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // w koncu sie zdecydowalem to napisac...ile razy mozna robic to samo..
     const check_col = function(col){
-        if(table[9].children[col].innerText == ''){
-            return [10, col, 10];
+        if(table[9].children[col].innerHTML == ''){
+            return [10, col, 'a'];
         }
         else{
             for(let i=0; i<10; i++){
-                if(table[i].children[col].innerText != ''){
-                    return [i, col, table[i].children[col].innerText];
+                if(table[i].children[col].innerHTML != ''){
+                    return [i, col, table[i].children[col].innerHTML];
                 }
             }
         }
@@ -237,54 +143,40 @@ document.addEventListener("DOMContentLoaded", function() {
 
     // drugi ruch to przesuniecie mniejszego krazka na wiekszy, pomijamy "1"
     const move2_auto = function(){
-        if(check_col(0)[2] == '1'){
-            if(check_col(1)[2] == '10' && check_col(2)[2] == '10'){
-                console.log('do nothing');
-            }
-            else if(check_col(1)[2] >= check_col(2)[2]){
-                table[check_col(1)[0]-1].children[1].innerText = table[check_col(2)[0]].children[2].innerText;
-                table[check_col(2)[0]].children[2].innerText = '';
-                return;
-            }
-            else{
-                table[check_col(2)[0]-1].children[2].innerText = table[check_col(1)[0]].children[1].innerText;
-                table[check_col(1)[0]].children[1].innerText = '';
-                return;
-            }
-        }
-        else if(check_col(1)[2] == '1'){
-            if(check_col(0)[2] == '10' && check_col(2)[2] == '10'){
-                console.log('do nothing');
-            }
-            else if(check_col(0)[2] >= check_col(2)[2]){
-                table[check_col(0)[0]-1].children[0].innerText = table[check_col(2)[0]].children[2].innerText;
-                table[check_col(2)[0]].children[2].innerText = '';
-                return;
-            }
-            else{
-                table[check_col(2)[0]-1].children[2].innerText = table[check_col(0)[0]].children[0].innerText;
-                table[check_col(0)[0]].children[0].innerText = '';
-                return;
+        let x; // funkcja kiedys skladala sie z 3 ifow, a przy uzyciu 2 zmiennych poprawie to
+        let y;
+        for(let i=0; i < 3; i++){
+            if(check_col(i)[2] == '<img src="1.jpg">'){
+                if(i == 0){
+                    x = 2;
+                    y = 1;
+                }
+                else if(i == 1){
+                    x = 0;
+                    y = 2;
+                }
+                else{
+                    x = 1;
+                    y = 0;
+                }
             }
         }
-        else if(check_col(2)[2] == '1'){
-            if(check_col(1)[2] == '10' && check_col(0)[2] == '10'){
-                console.log('do nothing');
-            }
-            else if(check_col(1)[2] >= check_col(0)[2]){
-                table[check_col(1)[0]-1].children[1].innerText = table[check_col(0)[0]].children[0].innerText;
-                table[check_col(0)[0]].children[0].innerText = '';
-                return;
-            }
-            else{
-                table[check_col(0)[0]-1].children[0].innerText = table[check_col(1)[0]].children[1].innerText;
-                table[check_col(1)[0]].children[1].innerText = '';
-                return;
-            }
+        if(check_col(x)[2] == 'a' && check_col(y)[2] == 'a'){
+            return;
         }
-
+        else if(check_col(x)[2] > check_col(y)[2]){
+            table[check_col(x)[0]-1].children[x].innerHTML = table[check_col(y)[0]].children[y].innerHTML;
+            table[check_col(y)[0]].children[y].innerHTML = '';
+            moves_counter.value++;
+            return;
+        }
+        else {
+            table[check_col(y)[0] - 1].children[y].innerHTML = table[check_col(x)[0]].children[x].innerHTML;
+            table[check_col(x)[0]].children[x].innerHTML = '';
+            moves_counter.value++;
+            return;
+        }
     }
-
 
     // podpiecie funkcji odpowiednio do przycisku help
     const help_button = document.getElementById('help_button');
@@ -292,10 +184,7 @@ document.addEventListener("DOMContentLoaded", function() {
         auto_solve_prepare();
         move1_auto();
         move2_auto();
-        if (table[9].children[0].innerText == '' && table[9].children[1].innerText == '' &&
-            table[0].children[0].innerText == '' && table[0].children[1].innerText == '') {
-            alert('wygrales');
-        }
+        you_won();
     });
 
 });
